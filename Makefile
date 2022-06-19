@@ -1,30 +1,34 @@
-# Clean results of previous build: Generate executable archive
-install:
-	./gradlew clean install
+setup:
+	gradle wrapper --gradle-version 7.2
 
-# Run executable file (do this after install)
-run-dist:
-	./build/install/app/bin/app
-
-# Check updates for dependencies (libraries; plugins from build.gradle)
-check-updates:
-	./gradlew dependencyUpdates
-
-# Compile project and run from console
-run:
+clean:
 	./gradlew clean
-	./gradlew run
 
-# Check code-style
-lint:
-	./gradlew checkstyleMain
-
-# Execute install tasks + another tasks
 build:
 	./gradlew clean build
 
-# For Jacoco test coverage with CodeClimate in main.yml
+start:
+	APP_ENV=development ./gradlew run
+
+install:
+	./gradlew install
+
+start-dist:
+	APP_ENV=production ./build/install/app/bin/app
+
+generate-migrations:
+	./gradlew generateMigrations
+
+lint:
+	./gradlew checkstyleMain checkstyleTest
+
+test:
+	./gradlew test
+
 report:
 	./gradlew jacocoTestReport
+
+check-updates:
+	./gradlew dependencyUpdates
 
 .PHONY: build

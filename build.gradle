@@ -6,12 +6,14 @@
  */
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.39.0'
-    id 'java'
-
+    id 'application'
     id 'checkstyle'
     id 'jacoco'
+
+    id 'io.ebean' version '12.12.1'
+
     id 'com.adarshr.test-logger' version '3.1.0'
+    id 'com.github.ben-manes.versions' version '0.39.0'
 }
 
 group = 'hexlet.code'
@@ -21,11 +23,18 @@ compileJava {
     options.release = 17
 }
 
+application {
+    mainClass = 'hexlet.code.App'
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'io.javalin:javalin:4.1.1'
+    implementation 'org.slf4j:slf4j-simple:1.7.32'
+
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'junit:junit:4.13.2'
 }
@@ -45,3 +54,6 @@ jacocoTestReport {
 testlogger {
     showStandardStreams true
 }
+
+task stage(dependsOn: ['clean', 'installDist'])
+installDist.mustRunAfter clean
