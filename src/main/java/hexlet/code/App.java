@@ -4,6 +4,11 @@ import hexlet.code.controllers.RootController;
 
 import io.javalin.Javalin;
 import io.javalin.core.validation.ValidationException;
+import io.javalin.plugin.rendering.template.JavalinThymeleaf;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 public class App {
 
@@ -16,9 +21,25 @@ public class App {
         app.get("/", RootController.welcome);
     }
 
+    private static TemplateEngine getTemplateEngine() {
+        TemplateEngine templateEngine = new TemplateEngine();
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("/templates/");
+
+        templateEngine.addTemplateResolver(templateResolver);
+        templateEngine.addDialect(new LayoutDialect());
+        templateEngine.addDialect(new Java8TimeDialect());
+
+        return templateEngine;
+    }
+
     public static Javalin getApp() {
         Javalin app = Javalin.create(config -> {
             config.enableDevLogging();
+            config.enableWebjars();
+
+            JavalinThymeleaf.configure(getTemplateEngine());
         });
 
         app.exception(ValidationException.class, (e, ctx) -> {

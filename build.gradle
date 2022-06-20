@@ -52,6 +52,12 @@ dependencies {
     annotationProcessor 'io.ebean:querybean-generator:12.11.5'
     implementation 'io.ebean:ebean-migration:12.11.2'
     implementation 'io.ebean:ebean-annotation:7.3'
+
+    implementation 'org.thymeleaf:thymeleaf:3.0.15.RELEASE'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+
+    implementation 'org.webjars:bootstrap:5.1.3'
 }
 
 
