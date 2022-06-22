@@ -59,12 +59,10 @@ public class UrlController {
 
     public static Handler showUrl = ctx -> {
         long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
-            System.out.println("\n\n!!!! id: " + id);
+
         Url url = new QUrl()
             .id.equalTo(id)
             .findOne();
-
-        System.out.println("\n\n!!!! url name: " + url.getName());
 
         ctx.sessionAttribute("url", url);
         ctx.render("urls/show.html");

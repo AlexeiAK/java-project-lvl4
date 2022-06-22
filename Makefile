@@ -7,13 +7,13 @@ clean:
 build:
 	./gradlew clean build
 
-start:
-	APP_ENV=development ./gradlew run
-
 install:
 	./gradlew install
 
-start-dist:
+start-dev:
+	APP_ENV=development ./gradlew run
+
+start-prod:
 	APP_ENV=production ./build/install/app/bin/app
 
 generate-migrations:
