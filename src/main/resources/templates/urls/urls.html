@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/application.html}">
+
+<section layout:fragment="content">
+    <div class="container-fluid p-5">
+        <h1 class="display-5 mb-3">Сайты</h1>
+
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Последняя проверка</th>
+                <th>Код ответа</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="url : ${urls}" th:object="${url}">
+                <td th:text="*{id}"></td>
+                <td>
+                    <a th:text="*{name}" th:href="@{/urls/{id}(id=*{id})}"></a>
+                </td>
+<!--                <td th:text="*{email}"></td>-->
+<!--                <td th:text="*{email}"></td>-->
+            </tr>
+        </table>
+    </div>
+
+    <div class="container">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" th:href="@{/urls(page=(${page < 2}) ? 1 : (${page - 1}))}">Prev</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" th:href="@{/urls(page=${page + 1})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</section>
+</html>

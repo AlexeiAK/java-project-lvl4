@@ -2,14 +2,34 @@
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/application.html}">
 
-<head>
-    <title>Welcome</title>
-</head>
-
 <section layout:fragment="content">
-    <div class="card">
-        <div class="card-body p-5 bg-light">
-            Hello! This is the Page analyzer.
+    <div class="container-fluid bg-dark p-5">
+        <div class="row">
+            <div class="col-md-10 col-lg-8 mx-auto text-white">
+
+                <h1 class="display-3 mb-3">Анализатор страниц</h1>
+                <p class="lead">Проверка сайта на SEO пригодность</p>
+
+                <form action="/urls" method="post" class="rss-form text-body">
+                    <div class="row">
+                        <div class="col-auto">
+                            <div class="form-floating">
+                                <input id="url-input" name="url" type="text" autofocus="" required placeholder="Ссылка"  aria-label="url" class="form-control w-100" autocomplete="off">
+                                <label for="url-input">Ссылка</label>
+                            </div>
+                        </div>
+
+                        <div class="col-auto">
+                            <button type="submit" class="h-100 btn btn-lg btn-primary px-sm-5">Проверить</button>
+                        </div>
+                    </div>
+                </form>
+
+                <p class="mt-2 mb-0 text-muted">Пример: https://www.google.com</p>
+
+            </div>
         </div>
     </div>
 </section>
+
+</html>

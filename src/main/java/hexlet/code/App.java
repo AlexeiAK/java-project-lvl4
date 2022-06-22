@@ -2,6 +2,7 @@ package hexlet.code;
 
 import hexlet.code.controllers.RootController;
 
+import hexlet.code.controllers.UrlController;
 import io.javalin.Javalin;
 import io.javalin.core.validation.ValidationException;
 import io.javalin.plugin.rendering.template.JavalinThymeleaf;
@@ -19,6 +20,10 @@ public class App {
 
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.welcome);
+
+        app.post("/urls", UrlController.createUrl);
+        app.get("/urls", UrlController.showUrls);
+        app.get("/urls/{id}", UrlController.showUrl);
     }
 
     private static TemplateEngine getTemplateEngine() {
