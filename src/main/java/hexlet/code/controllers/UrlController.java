@@ -8,6 +8,8 @@ import io.javalin.http.Handler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class UrlController {
     public static Handler showUrls = ctx -> {
@@ -20,23 +22,30 @@ public class UrlController {
             .setMaxRows(rowsPerPage)
             .orderBy().id.asc()
             .findPagedList();
-
         List<Url> urls = pagedArticles.getList();
 
+        int lastPage = pagedArticles.getTotalPageCount() + 1;
+        int currentPage = pagedArticles.getPageIndex() + 1;
+        List<Integer> pages = IntStream
+            .range(1, lastPage)
+            .boxed()
+            .collect(Collectors.toList());
+
         ctx.attribute("urls", urls);
-        ctx.attribute("page", page);
+        ctx.attribute("pages", pages);
+        ctx.attribute("currentPage", currentPage);
 
         ctx.render("urls/urls.html");
     };
 
+
     public static Handler createUrl = ctx -> {
         String urlFromForm = ctx.formParam("url");
-
-        URL parsedUrl = null;
+        String hostName = null;
 
         try {
-            parsedUrl = new URL(urlFromForm);
-            String hostName = parsedUrl.getAuthority();
+            URL parsedUrl = new URL(urlFromForm);
+            hostName = parsedUrl.getAuthority();
 
             Url url = new QUrl()
                 .name.equalTo(hostName)
@@ -44,18 +53,23 @@ public class UrlController {
 
             if (url != null) {
                 ctx.sessionAttribute("flash", "Страница уже существует");
+                ctx.sessionAttribute("flash-type", "info");
             } else {
                 Url newUrl = new Url(hostName);
                 newUrl.save();
 
                 ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                ctx.sessionAttribute("flash-type", "success");
             }
         } catch (MalformedURLException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.redirect("/");
         }
 
         ctx.redirect("/urls");
     };
+
 
     public static Handler showUrl = ctx -> {
         long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
