@@ -18,10 +18,18 @@ public class App {
         return Integer.valueOf(port);
     }
 
+    private static String getMode() {
+        return System.getenv().getOrDefault("APP_ENV", "development");
+    }
+
+    private static boolean isProduction() {
+        return getMode().equals("production");
+    }
+
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.welcome);
 
-        app.post("/urls", UrlController.createUrl);
+        app.post("/urls", UrlController.addUrl);
         app.get("/urls", UrlController.showUrls);
         app.get("/urls/{id}", UrlController.showUrl);
     }

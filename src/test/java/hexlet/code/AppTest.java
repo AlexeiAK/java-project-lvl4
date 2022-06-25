@@ -68,14 +68,16 @@ class AppTest {
         assertThat(content).contains("https://id.heroku.com");
     }
 
-//    @Test
-//    void testUrl() {
-//        HttpResponse<String> response = Unirest
-//            .get(baseUrl + "/urls/2")
-//            .asString();
-//        String content = response.getBody();
-//
-//        assertThat(response.getStatus()).isEqualTo(200);
-//        assertThat(content).contains("https://id.heroku.com");
-//    }
+    @Test
+    void testUrl() {
+        HttpResponse<String> response = Unirest
+            .get(baseUrl + "/urls/2")
+            .asString();
+        String content = response.getBody();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(content).contains("https://id.heroku.com");
+    }
+
+
 }

@@ -4,6 +4,7 @@ import hexlet.code.domain.Url;
 import hexlet.code.domain.query.QUrl;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
+import io.javalin.http.NotFoundResponse;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,7 +40,7 @@ public class UrlController {
     };
 
 
-    public static Handler createUrl = ctx -> {
+    public static Handler addUrl = ctx -> {
         String urlFromForm = ctx.formParam("url");
         String hostName = null;
 
@@ -65,6 +66,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("/");
+            return;
         }
 
         ctx.redirect("/urls");
@@ -78,7 +80,11 @@ public class UrlController {
             .id.equalTo(id)
             .findOne();
 
-        ctx.sessionAttribute("url", url);
+        if (url == null) {
+            throw new NotFoundResponse();
+        }
+
+        ctx.attribute("url", url);
         ctx.render("urls/show.html");
     };
 

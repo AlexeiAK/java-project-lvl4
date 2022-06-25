@@ -1,25 +1,26 @@
+<!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/application.html}">
+    layout:decorate="~{layouts/application.html}">
 
 <section layout:fragment="content">
-    <div class="container" th:object="${url}">
-        <h1 class="display-5 mb-3" th:utext="'Сайт ' + *{name}"></h1>
 
-        <table class="table w-50">
-            <thead class="thead-dark">
+    <div class="container-fluid mt-5">
+        <h1 class="display-5 mb-3" th:text="'Сайт ' + ${url.name}"></h1>
+
+        <table class="table w-50"><thead class="thead-dark">
             <tr>
                 <th>ID</th>
-                <td th:text="*{id}"></td>
+                <td th:text="${url.id}"></td>
             </tr>
             <tr>
                 <th>Имя</th>
-                <td th:text="*{name}"></td>
+                <td th:text="${url.name}"></td>
             </tr>
             <tr>
-                <td>Последняя проверка</td>
+                <th>Последняя проверка</th>
+                <td th:text="${url.createdAt}"></td>
             </tr>
-            </thead>
-            <tbody>
+            </thead><tbody>
         </table>
     </div>
 
