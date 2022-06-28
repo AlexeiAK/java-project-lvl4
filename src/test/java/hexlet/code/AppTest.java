@@ -1,37 +1,52 @@
 package hexlet.code;
 
+import hexlet.code.domain.Url;
+import hexlet.code.domain.query.QUrl;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.javalin.Javalin;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 class AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static Transaction transaction;
+    private static MockWebServer mockWebServer;
 
     @BeforeAll
-    public static void beforeAll() {
+    public static void beforeAll() throws IOException {
         app = App.getApp();
         app.start(0);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
+
+        mockWebServer = new MockWebServer();
+        Path filePath = Path.of("src/test/resources/mockPage.html");
+        String html = Files.readString(filePath);
+        mockWebServer.enqueue(new MockResponse().setBody(html));
+        mockWebServer.start();
     }
 
     @AfterAll
-    public static void afterAll() {
+    public static void afterAll() throws IOException {
         app.stop();
+        mockWebServer.shutdown();
     }
 
     @BeforeEach
@@ -78,7 +93,6 @@ class AppTest {
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(content).contains("https://id.heroku.com");
     }
-
 
     @Test
     void testAddSuccessAndAlreadyAdd() {
@@ -144,5 +158,50 @@ class AppTest {
 
         assertThat(body01).contains("Некорректный URL");
     }
+
+    @Test
+    void testChecks() {
+//        final String expectedDescription = "Description 01";
+//        final String expectedTitle = "Title 01";
+//        final String expectedH1 = "The h1 01";
+
+        final String mockSiteUrl = mockWebServer.url("/").toString();
+        final String correctMockUrl = mockSiteUrl.substring(0, mockSiteUrl.length() - 1);
+
+        Unirest
+            .post(baseUrl + "/urls")
+            .field("url", mockSiteUrl)
+            .asString();
+
+        Url actualUrl = new QUrl()
+            .name.equalTo(correctMockUrl)
+            .findOne();
+
+        // Check that mock site exists
+        HttpResponse<String> response = Unirest
+            .get(baseUrl + "/urls/" + actualUrl.getId())
+            .asString();
+        String content = response.getBody();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(content).contains(correctMockUrl);
+
+
+
+        // Check that UrlController.checkUrl works
+//        Unirest
+//            .post(baseUrl + "/urls/" + actualUrl.getId() + "/checks")
+//            .asString();
+//
+//        String pageOfMockSiteCheck = Unirest
+//            .post(baseUrl + "/urls/" + actualUrl.getId())
+//            .asString()
+//            .getBody();
+//
+//        assertThat(pageOfMockSiteCheck).contains(expectedDescription);
+//        assertThat(pageOfMockSiteCheck).contains(expectedTitle);
+//        assertThat(pageOfMockSiteCheck).contains(expectedH1);
+    }
+
 
 }

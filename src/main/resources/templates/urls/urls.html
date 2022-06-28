@@ -6,7 +6,7 @@
     <div class="container-lg mt-5">
         <h1 class="display-5 mb-3">Сайты</h1>
 
-        <table class="table mt-3">
+        <table class="table mt-3 table-hover">
             <thead class="thead-light">
             <tr>
                 <th>ID</th>
@@ -22,8 +22,8 @@
                 <td>
                     <a th:text="*{name}" th:href="@{/urls/{id}(id=*{id})}"></a>
                 </td>
-<!--                <td th:text="*{email}"></td>-->
-<!--                <td th:text="*{email}"></td>-->
+                <td th:unless="*{urlChecks.isEmpty}" th:text="*{#temporals.format(urlChecks[urlChecks.size-1].createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:unless="*{urlChecks.isEmpty}" th:text="*{urlChecks.get(0).statusCode}"></td>
             </tr>
         </table>
     </div>

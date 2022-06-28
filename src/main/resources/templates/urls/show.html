@@ -4,7 +4,7 @@
 
 <section layout:fragment="content">
 
-    <div class="container-fluid mt-5">
+    <div class="container-lg mt-5">
         <h1 class="display-5 mb-3" th:text="'Сайт ' + ${url.name}"></h1>
 
         <table class="table w-50"><thead class="thead-dark">
@@ -18,10 +18,40 @@
             </tr>
             <tr>
                 <th>Последняя проверка</th>
-                <td th:text="${url.createdAt}"></td>
+                <td th:text="${#temporals.format(url.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
             </tr>
             </thead><tbody>
         </table>
+
+
+        <h1 class="display-5 mt-4" th:text="Проверки"></h1>
+        <form method="post" th:action="@{/urls/{id}/checks(id=${url.id})}">
+            <button type="submit" class="btn btn-primary">Запустить проверку</button>
+        </form>
+
+        <table class="table mt-3 table-hover ">
+            <thead class="thead-light">
+            <tr>
+                <th>ID</th>
+                <th>Код ответа</th>
+                <th>Title</th>
+                <th>H1</th>
+                <th>Description</th>
+                <th>Последняя проверка</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="urlCheck : ${urlChecks}" th:object="${urlCheck}">
+                <td th:text="*{id}"></td>
+                <td th:text="*{statusCode}"></td>
+                <td th:text="${#strings.abbreviate(urlCheck.title, 13)}"></td>
+                <td th:text="${#strings.abbreviate(urlCheck.h1, 13)}"></td>
+                <td th:text="${#strings.abbreviate(urlCheck.description, 30)}"></td>
+                <td th:text="${#temporals.format(urlCheck.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+            </tr>
+        </table>
+
     </div>
 
 </section>

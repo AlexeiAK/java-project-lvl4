@@ -32,6 +32,8 @@ public class App {
         app.post("/urls", UrlController.addUrl);
         app.get("/urls", UrlController.showUrls);
         app.get("/urls/{id}", UrlController.showUrl);
+
+        app.post("/urls/{id}/checks", UrlController.checkUrl);
     }
 
     private static TemplateEngine getTemplateEngine() {
