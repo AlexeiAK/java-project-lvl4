@@ -7,16 +7,16 @@ import io.ebean.Transaction;
 import io.javalin.Javalin;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import okhttp3.HttpUrl;
-import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -28,26 +28,6 @@ class AppTest {
     private static String baseUrl;
     private static Transaction transaction;
     private static MockWebServer mockWebServer;
-    private final static Dispatcher dispatcher = new Dispatcher() {
-        @Override
-        public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
-            String pageWithAllParameters;
-            String pageWithSomeParameters;
-            try {
-                pageWithAllParameters = Files.readString(Path.of("src/test/resources/mockPage.html"));
-//                pageWithSomeParameters = Files.readString(Path.of("src/test/resources/mockPage.html"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-
-            return switch (request.getPath()) {
-                case "/v1/page01/" -> new MockResponse().setResponseCode(200).setBody(pageWithAllParameters);
-//                case "/v1/page02/" -> new MockResponse().setResponseCode(200).setBody(pageWithSomeParameters);
-                default -> new MockResponse().setResponseCode(404);
-            };
-        }
-    };
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -57,10 +37,8 @@ class AppTest {
         baseUrl = "http://localhost:" + port;
 
         mockWebServer = new MockWebServer();
-//        Path filePath = Path.of("src/test/resources/mockPage.html");
-//        String pageWithAllParameters = Files.readString(filePath);
-//        mockWebServer.enqueue(new MockResponse().setBody(html));
-        mockWebServer.setDispatcher(dispatcher);
+        String pageWithAllParameters = Files.readString(Path.of("src/test/resources/mockPage.html"));
+        mockWebServer.enqueue(new MockResponse().setBody(pageWithAllParameters));
         mockWebServer.start();
     }
 
@@ -181,13 +159,9 @@ class AppTest {
     }
 
     @Test
-    void testChecks() throws MalformedURLException {
-        HttpUrl url01 = mockWebServer.url("/v1/page01/");
-        HttpUrl url02 = mockWebServer.url("/v1/page02/");
-
-        String mockSiteUrl = mockWebServer.url(url01.toString()).toString();
-        URL parsedUrl = new URL(mockSiteUrl);
-        String hostName = parsedUrl.getProtocol() + "://" + parsedUrl.getAuthority();
+    void testChecks() {
+        final String mockSiteUrl = mockWebServer.url("/").toString();
+        final String correctMockUrl = mockSiteUrl.substring(0, mockSiteUrl.length() - 1);
 
         Unirest
             .post(baseUrl + "/urls")
@@ -195,7 +169,7 @@ class AppTest {
             .asString();
 
         Url actualUrl = new QUrl()
-            .name.equalTo(hostName)
+            .name.equalTo(correctMockUrl)
             .findOne();
 
         // Check that mock site exists
@@ -205,7 +179,7 @@ class AppTest {
         String content = response.getBody();
 
         assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(content).contains(hostName);
+        assertThat(content).contains(correctMockUrl);
 
         // Check that UrlController.checkUrl works
         // if all HTML parameters exist

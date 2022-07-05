@@ -93,7 +93,7 @@ public class UrlController {
         }
 
         List<UrlCheck> urlsChecks = new QUrlCheck()
-//            url_id.getId().equalTo(id)
+            .url.id.equalTo(id)
             .orderBy().id.desc()
             .findList();
 
@@ -134,7 +134,6 @@ public class UrlController {
         } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Страница недоступна");
             ctx.sessionAttribute("flash-type", "danger");
-            return;
         }
 
         ctx.redirect("/urls/" + id);

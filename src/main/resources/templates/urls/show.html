@@ -45,9 +45,9 @@
             <tr th:each="urlCheck : ${urlChecks}" th:object="${urlCheck}">
                 <td th:text="*{id}"></td>
                 <td th:text="*{statusCode}"></td>
-                <td th:text="${#strings.abbreviate(urlCheck.title, 13)}"></td>
-                <td th:text="${#strings.abbreviate(urlCheck.h1, 13)}"></td>
-                <td th:text="${#strings.abbreviate(urlCheck.description, 30)}"></td>
+                <td th:text="${#strings.abbreviate(urlCheck.title, 20)}"></td>
+                <td th:text="${#strings.abbreviate(urlCheck.h1, 20)}"></td>
+                <td th:text="${#strings.abbreviate(urlCheck.description, 40)}"></td>
                 <td th:text="${#temporals.format(urlCheck.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
             </tr>
         </table>
