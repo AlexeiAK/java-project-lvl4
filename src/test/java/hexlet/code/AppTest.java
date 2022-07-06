@@ -27,7 +27,8 @@ class AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static Transaction transaction;
-    private static MockWebServer mockWebServer;
+    private static MockWebServer mockWebServer01;
+    private static MockWebServer mockWebServer02;
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -36,16 +37,25 @@ class AppTest {
         int port = app.port();
         baseUrl = "http://localhost:" + port;
 
-        mockWebServer = new MockWebServer();
-        String pageWithAllParameters = Files.readString(Path.of("src/test/resources/mockPage.html"));
-        mockWebServer.enqueue(new MockResponse().setBody(pageWithAllParameters));
-        mockWebServer.start();
+
+        mockWebServer01 = new MockWebServer();
+        mockWebServer02 = new MockWebServer();
+
+        String pageWithAllParameters = Files.readString(Path.of("src/test/resources/mockPage01.html"));
+        String pageWithSomeParameters = Files.readString(Path.of("src/test/resources/mockPage02.html"));
+
+        mockWebServer01.enqueue(new MockResponse().setBody(pageWithAllParameters));
+        mockWebServer02.enqueue(new MockResponse().setBody(pageWithSomeParameters));
+
+        mockWebServer01.start();
+        mockWebServer02.start();
     }
 
     @AfterAll
     public static void afterAll() throws IOException {
         app.stop();
-        mockWebServer.shutdown();
+        mockWebServer01.shutdown();
+        mockWebServer02.shutdown();
     }
 
     @BeforeEach
@@ -95,8 +105,8 @@ class AppTest {
 
     @Test
     void testAddSuccessAndAlreadyAdd() {
-        String requestUrl01 = "https://www.youtube.com/c/google";
-        String parsedUrl01 = "www.youtube.com";
+        final String requestUrl01 = "https://www.youtube.com/c/google";
+        final String parsedUrl01 = "www.youtube.com";
 
         HttpResponse response01 = Unirest
             .post(baseUrl + "/urls")
@@ -107,10 +117,10 @@ class AppTest {
         assertThat(response01.getHeaders().getFirst("Location")).isEqualTo("/urls");
 
 
-        String requestUrl02 = "https://www.youtube.com:800";
-        String parsedUrl02 = "www.youtube.com:800";
+        final String requestUrl02 = "https://www.youtube.com:800";
+        final String parsedUrl02 = "www.youtube.com:800";
 
-        HttpResponse response02 = Unirest
+        Unirest
             .post(baseUrl + "/urls")
             .field("url", requestUrl02)
             .asEmpty();
@@ -126,7 +136,7 @@ class AppTest {
         assertThat(body01).contains("Страница успешно добавлена");
 
 
-        HttpResponse response03 = Unirest
+        Unirest
             .post(baseUrl + "/urls")
             .field("url", requestUrl01)
             .asEmpty();
@@ -159,8 +169,8 @@ class AppTest {
     }
 
     @Test
-    void testChecks() {
-        final String mockSiteUrl = mockWebServer.url("/").toString();
+    void testChecks01() {
+        final String mockSiteUrl = mockWebServer01.url("/").toString();
         final String correctMockUrl = mockSiteUrl.substring(0, mockSiteUrl.length() - 1);
 
         Unirest
@@ -195,6 +205,49 @@ class AppTest {
         final String expectedDescription = "Description 01";
         final String expectedTitle = "Title 01";
         final String expectedH1 = "The h1 01";
+
+        assertThat(pageOfMockSiteCheck).contains(expectedDescription);
+        assertThat(pageOfMockSiteCheck).contains(expectedTitle);
+        assertThat(pageOfMockSiteCheck).contains(expectedH1);
+    }
+
+    @Test
+    void testChecks02() {
+        final String mockSiteUrl = mockWebServer02.url("/").toString();
+        final String correctMockUrl = mockSiteUrl.substring(0, mockSiteUrl.length() - 1);
+
+        Unirest
+            .post(baseUrl + "/urls")
+            .field("url", mockSiteUrl)
+            .asString();
+
+        Url actualUrl = new QUrl()
+            .name.equalTo(correctMockUrl)
+            .findOne();
+
+        // Check that mock site exists
+        HttpResponse<String> response = Unirest
+            .get(baseUrl + "/urls/" + actualUrl.getId())
+            .asString();
+        String content = response.getBody();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(content).contains(correctMockUrl);
+
+        // Check that UrlController.checkUrl works
+        // if not all HTML parameters exist
+        Unirest
+            .post(baseUrl + "/urls/" + actualUrl.getId() + "/checks")
+            .asString();
+
+        String pageOfMockSiteCheck = Unirest
+            .get(baseUrl + "/urls/" + actualUrl.getId())
+            .asString()
+            .getBody();
+
+        final String expectedDescription = "";
+        final String expectedTitle = "Title 01";
+        final String expectedH1 = "";
 
         assertThat(pageOfMockSiteCheck).contains(expectedDescription);
         assertThat(pageOfMockSiteCheck).contains(expectedTitle);
