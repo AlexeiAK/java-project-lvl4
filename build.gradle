@@ -10,8 +10,6 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
 
-    id 'idea'
-    id 'java'
     id 'io.ebean' version '12.11.5'
 
     id 'com.adarshr.test-logger' version '3.1.0'
@@ -98,13 +96,3 @@ task generateMigrations(type: JavaExec) {
 
 task stage(dependsOn: ['clean', 'installDist'])
 installDist.mustRunAfter clean
-
-//task executeApp() {
-//    doFirst {
-//        println "Executing java app from Gradle..."
-//        javaexec {
-//            main = "hexlet.code.App"
-//            jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=30000"]
-//        }
-//    }
-//}
