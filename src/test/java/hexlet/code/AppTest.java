@@ -147,6 +147,7 @@ class AppTest {
         String body02 = responseWithAlreadyAdd.getBody();
 
         assertThat(body02).contains("Страница уже существует");
+        assertThat(body02).contains(parsedUrl01);
     }
 
     @Test

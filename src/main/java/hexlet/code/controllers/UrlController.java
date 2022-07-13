@@ -70,6 +70,7 @@ public class UrlController {
         if (url != null) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "info");
+            ctx.redirect("/urls");
             return;
         }
 
